@@ -5,30 +5,28 @@ app = Flask(__name__)
 
 app.config['DEBUG'] = True      # displays runtime errors in the browser, too
 
+
+def UserName():
+    
+
 @app.route("/crossoff", methods=['POST'])
-def crossoff_movie():
-    crossed_off_movie = request.form['crossed-off-movie']
+def user_signup():
+    user_signup = request.form['index']
 
-    if crossed_off_movie not in get_current_watchlist():
-        # the user tried to cross off a movie that isn't in their list,
-        # so we redirect back to the front page and tell them what went wrong
-        error = "'{0}' is not in your Watchlist, so you can't cross it off!".format(crossed_off_movie)
-
+    if username not in UserName():
+        # the user tried to enter a user name that was no valid
+        error = "'{0}' is not a valid user name, please try again.".format(user_signup)
         # redirect to homepage, and include error as a query parameter in the URL
         return redirect("/?error=" + error)
 
+
     # if we didn't redirect by now, then all is well
-    return render_template('crossoff.html', crossed_off_movie=crossed_off_movie)
+    return render_template('welcome.html', user_signup=user_signup)
 
 @app.route("/add", methods=['POST'])
 def add_movie():
     # look inside the request to figure out what the user typed
     new_movie = request.form['new-movie']
-
-    # if the user typed nothing at all, redirect and tell them the error
-    if (not new_movie) or (new_movie.strip() == ""):
-        error = "Please specify the movie you want to add."
-        return redirect("/?error=" + error)
 
     # if the user wants to add a terrible movie, redirect and tell them the error
     if new_movie in terrible_movies:
