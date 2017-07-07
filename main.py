@@ -1,6 +1,8 @@
 from flask import Flask, request, redirect, render_template
 import cgi
 import string
+import re
+
 
 app = Flask(__name__)
 
@@ -34,15 +36,16 @@ def ValidateVerify(password, verify):
         return 'Password and verify do not match'
     return ''
 def ValidateEmail(email):
-    if email == '':
+    emailRegEx = re.compile('[\w\.]+@[\w]+\.[\w\.]+')
+    if email:
+        if emailRegEx.match(email) is not None:
+            return ''
+        else:
+            return 'This is not a valid email'
+    else:
         return ''
-    elif len(email) < 3:
-        return 'Password must be longer than 3 characters'
-    elif len(email) > 20: 
-        return 'Password must be less than or equal to 20 characters'
-    elif not str.isalpha(password):
-        return "This is not a valid password, please use only letters"
-    return ''
+    
+    
 
 @app.route("/", methods=['GET'])
 def index():
@@ -59,9 +62,10 @@ def postback():
     usernameMessage = ValidateUserName(username)
     passwordMessage = ValidatePassword(password)
     verifyMessage = ValidateVerify(password, verify)
+    emailMessage = ValidateEmail(email)
     
-    if usernameMessage != '' or passwordMessage != '' or verifyMessage != '':
-        return render_template('index.html',username=username, email=email, usernameMessage = usernameMessage, passwordMessage=passwordMessage, verifyMessage=verifyMessage)
+    if usernameMessage != '' or passwordMessage != '' or verifyMessage != '' or emailMessage != '':
+        return render_template('index.html',username=username, email=email, usernameMessage = usernameMessage, passwordMessage=passwordMessage, verifyMessage=verifyMessage, emailMessage=emailMessage)
     return render_template('welcome.html', username=username)
     #return render_template('index.html')
 #The user leaves any of the following fields empty: username, password, verify password.
